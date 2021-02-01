@@ -32,6 +32,7 @@ func BuildDBConfig() *DBConfig {
 		Password: utils.Env("DB_PASSWORD"),
 		DBName:   utils.Env("DB_DATABASE"),
 	}
+
 	return &dbConfig
 }
 

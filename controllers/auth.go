@@ -17,8 +17,7 @@ func Register(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"code" : http.StatusInternalServerError,
 			"success" : false,
-			"message" : "Can not get register request.",
-			"errors" : requestErr,
+			"message" : requestErr.Error(),
 		})
 		return
 	}
@@ -28,8 +27,7 @@ func Register(c *gin.Context) {
 		c.JSON(http.StatusUnprocessableEntity, gin.H{
 			"code" : http.StatusUnprocessableEntity,
 			"success" : false,
-			"message" : "Register validation is error.",
-			"errors" : err,
+			"message" : err,
 		})
 		return
 	}
@@ -42,7 +40,6 @@ func Register(c *gin.Context) {
 				"code" : http.StatusUnprocessableEntity,
 				"success" : false,
 				"message" : "This username already exists in the system.",
-				"errors" : nil,
 			})
 			return
 		}
@@ -53,8 +50,7 @@ func Register(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"code" : http.StatusInternalServerError,
 			"success" : false,
-			"message" : "Can not do something the password.",
-			"errors" : bcryptErr,
+			"message" : bcryptErr.Error(),
 		})
 		return
 	}
@@ -67,8 +63,7 @@ func Register(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"code" : http.StatusInternalServerError,
 			"success" : false,
-			"message" : "Register is failed.",
-			"errors" : nil,
+			"message" : creatErr.Error(),
 		})
 		return
 	}
@@ -108,8 +103,8 @@ func Login(c *gin.Context)  {
 	if userInDbErr != nil {
 		errMap := make(map[string]string)
 		errMap["username"] = "This username is not exists in the system."
-		c.JSON(http.StatusNotFound, gin.H{
-			"code" : http.StatusNotFound,
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"code" : http.StatusUnauthorized,
 			"success" : false,
 			"message" : errMap,
 		})
@@ -130,24 +125,62 @@ func Login(c *gin.Context)  {
 
 	token, errToken := services.GetJwtToken(user)
 	if errToken != nil {
-		errMap := make(map[string]string)
-		errMap["token"] = errToken.Error()
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"code" : http.StatusInternalServerError,
 			"success" : false,
-			"message" : errMap,
+			"message" : errToken.Error(),
+		})
+		return
+	}
+
+	storeRedisErr := services.StoreRedis(user.Uuid, token)
+	if storeRedisErr != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"code" : http.StatusInternalServerError,
+			"success" : false,
+			"message" : storeRedisErr.Error(),
 		})
 		return
 	}
 
 	data := make(map[string]string)
-	data["token"] = token
+	data["token"] = token.AccessToken
 	data["token_type"] = "Bearer "
 
 	c.JSON(http.StatusOK, gin.H{
 		"success" : true,
 		"message" : "Successfully logged in.",
 		"data" : data,
+	})
+	return
+}
+
+func Logout(c *gin.Context)  {
+
+	accessToken, accessTokenErr := services.ParseJwtToken(c.Request)
+
+	if accessTokenErr != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"code" : http.StatusUnauthorized,
+			"success" : false,
+			"message" : "unauthorized",
+		})
+		return
+	}
+
+	deleted, delErr := services.DeleteJwtToken(accessToken)
+	if delErr != nil || deleted == 0 {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"code" : http.StatusUnauthorized,
+			"success" : false,
+			"message" : "unauthorized",
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"success" : true,
+		"message" : "Successfully logged out.",
 	})
 	return
 }
