@@ -24,43 +24,75 @@ func (b *Task) TableName() string {
 }
 
 //insert a Task
-func CreateTask(todo *Task) (err error) {
+func CreateTask(task *Task) (err error) {
 
-	todo.Uuid = uuid.NewV4().String()
+	task.Uuid = uuid.NewV4().String()
 
-	if err = config.DB.Create(todo).Error; err != nil {
+	if err = config.DB.Create(task).Error; err != nil {
 		return err
 	}
 	return nil
 }
 
 //fetch all Task
-func GetAllTask(todo *[]Task, userId uint) (err error) {
-	if err := config.DB.Where("user_id = ?", userId).Order("id desc").Find(todo).Error; err != nil {
+func GetAllTask(task *[]Task, userId uint) (err error) {
+	if err := config.DB.Where("user_id = ?", userId).Order("id desc").Find(task).Error; err != nil {
 		return err
 	}
 	return nil
 }
 
 //fetch one Task
-func GetATaskByUuid(todo *Task, uuid string) (err error) {
-	if err := config.DB.Where("uuid = ?", uuid).First(todo).Error; err != nil {
+func GetATaskByUuid(task *Task, uuid string) (err error) {
+	if err := config.DB.Where("uuid = ?", uuid).First(task).Error; err != nil {
 		return err
 	}
 	return nil
 }
 
 //update a Task
-func UpdateATaskByUuid(todo *Task, uuid string) (err error) {
-	if err := config.DB.Where("uuid = ?", uuid).Updates(todo).Error; err != nil {
+func UpdateATask(task *Task) (err error) {
+	if err := config.DB.Save(task).Error; err != nil {
+		return err
+	}
+	return nil
+}
+
+//update a Task by multiple key
+func UpdateTaskByMany(task *Task, request map[string]interface{}) (err error) {
+	if err := config.DB.Model(task).Updates(request).Error; err != nil {
+		return err
+	}
+	return nil
+}
+
+//update complete Task
+func UpdateCompletedTask(task *Task) (err error) {
+	if err := config.DB.Model(task).Update("is_completed", true).Error; err != nil {
+		return err
+	}
+	return nil
+}
+
+//update undo Task
+func UpdateUndoTask(task *Task) (err error) {
+	if err := config.DB.Model(task).Update("is_completed", false).Error; err != nil {
 		return err
 	}
 	return nil
 }
 
 //delete a Task
-func DeleteATaskByUuid(todo *Task, uuid string) (err error) {
-	if err := config.DB.Where("id = ?", uuid).Delete(todo).Error; err != nil {
+func DeleteATask(task *Task) (err error) {
+	if err := config.DB.Delete(task).Error; err != nil {
+		return err
+	}
+	return nil
+}
+
+//delete a Task
+func DeleteTasks(task *Task, userId uint) (err error) {
+	if err := config.DB.Where("user_id = ?", userId).Delete(task).Error; err != nil {
 		return err
 	}
 	return nil

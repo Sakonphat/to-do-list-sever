@@ -19,9 +19,9 @@ func SetupRouter() *gin.Engine {
 		v1.GET("/task/:uuid", middlewares.Authentication(), middlewares.ErrorHandler, controllers.GetTask)
 		v1.GET("/tasks", middlewares.Authentication(), middlewares.ErrorHandler, controllers.GetAllTask)
 		v1.PUT("/edit", middlewares.Authentication(), middlewares.ErrorHandler, controllers.EditTask)
-		v1.PUT("/complete/{uuid}", middlewares.Authentication(), middlewares.ErrorHandler, controllers.CompleteTask)
-		v1.PUT("/undo/{uuid}", middlewares.Authentication(), middlewares.ErrorHandler, controllers.UndoTask)
-		v1.DELETE("/delete/{uuid}", middlewares.Authentication(), middlewares.ErrorHandler, controllers.DeleteTask)
+		v1.PUT("/complete/:uuid", middlewares.Authentication(), middlewares.ErrorHandler, controllers.CompleteTask)
+		v1.PUT("/undo/:uuid", middlewares.Authentication(), middlewares.ErrorHandler, controllers.UndoTask)
+		v1.DELETE("/delete/:uuid", middlewares.Authentication(), middlewares.ErrorHandler, controllers.DeleteTask)
 		v1.DELETE("/delete-all", middlewares.Authentication(), middlewares.ErrorHandler, controllers.DeleteAllTask)
 	}
 	return r
