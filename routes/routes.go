@@ -22,7 +22,7 @@ func SetupRouter() *gin.Engine {
 
 		v1.POST("/task", middlewares.Authentication(), controllers.CreateTask)
 		v1.GET("/task/:uuid", middlewares.Authentication(), controllers.GetTask)
-		v1.GET("/tasks", middlewares.Authentication(), controllers.GetAllTask)
+		v1.POST("/tasks", middlewares.Authentication(), controllers.GetAllTask)
 		v1.PUT("/edit", middlewares.Authentication(), controllers.EditTask)
 		v1.PUT("/complete/:uuid", middlewares.Authentication(), controllers.CompleteTask)
 		v1.PUT("/undo/:uuid", middlewares.Authentication(), controllers.UndoTask)

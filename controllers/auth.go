@@ -36,10 +36,12 @@ func Register(c *gin.Context) {
 	userInDbErr := models.GetUser(&user, request.Username)
 	if userInDbErr == nil {
 		if user.Username == request.Username {
+			err := make(map[string]string)
+			err["username"] = "This username already exists in the system."
 			c.JSON(http.StatusUnprocessableEntity, gin.H{
 				"code" : http.StatusUnprocessableEntity,
 				"success" : false,
-				"message" : "This username already exists in the system.",
+				"message" : err,
 			})
 			return
 		}
@@ -103,8 +105,8 @@ func Login(c *gin.Context)  {
 	if userInDbErr != nil {
 		errMap := make(map[string]string)
 		errMap["username"] = "This username is not exists in the system."
-		c.JSON(http.StatusUnauthorized, gin.H{
-			"code" : http.StatusUnauthorized,
+		c.JSON(http.StatusUnprocessableEntity, gin.H{
+			"code" : http.StatusUnprocessableEntity,
 			"success" : false,
 			"message" : errMap,
 		})
