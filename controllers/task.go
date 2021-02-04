@@ -399,6 +399,7 @@ func makeData(tasks *[]models.Task) []map[string]interface{} {
 			"title" : task.Title,
 			"description" : task.Description,
 			"is_completed" : task.IsCompleted,
+			"created_at" : task.CreatedAt,
 		}
 		data = append(data, temp)
 	}
