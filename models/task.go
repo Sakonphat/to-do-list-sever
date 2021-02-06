@@ -12,7 +12,7 @@ type Task struct {
 	Uuid string			`gorm:"column:uuid;not null;"`
 	UserId uint			`gorm:"column:user_id;not null;"`
 	Title string		`gorm:"column:title;not null;"`
-	Description string	`gorm:"column:description;"`
+	Description string	`gorm:"column:description;type:LONGTEXT;"`
 	IsCompleted bool	`gorm:"column:is_completed;type:bool;default:false;"`
 	CreatedAt time.Time
 	UpdatedAt time.Time
